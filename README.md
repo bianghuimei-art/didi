@@ -1,6 +1,6 @@
 # 别杨慧美 · AI 产品运营 作品集页
 
-深色还原版个人作品页,基于 lingxi 官网的交互/滚动/横滑特效,内容为 AI 产品运营简历与作品。
+深色还原版个人作品页,基于交互/滚动/横滑特效,内容为 AI 产品运营简历与作品。
 
 **在线访问**: https://bianghuimei-art.github.io/didi/
 (仓库: https://github.com/bianghuimei-art/didi )
