@@ -2,7 +2,8 @@
 
 深色还原版个人作品页,基于 lingxi 官网的交互/滚动/横滑特效,内容为 AI 产品运营简历与作品。
 
-**在线访问**:部署后通过 GitHub Pages 打开,链接为 `https://<你的用户名>.github.io/huimei-page-gh-pages/`
+**在线访问**: https://bianghuimei-art.github.io/didi/
+(仓库: https://github.com/bianghuimei-art/didi )
 
 ## 本地查看
 双击 `打开作品页.cmd`(自动 `node serve.js` 并打开 http://127.0.0.1:3082/),或直接 `node serve.js`。
