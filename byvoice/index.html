@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BY配音 · AI 配音工作台</title>
+<style>
+:root{
+  --bg:#f5f8ff; --panel:#ffffff; --panel2:#eef3fc; --line:rgba(30,60,120,.10);
+  --ink:#1d2b4d; --sub:#5a6a8c; --dim:#8b97b0;
+  --c1:#4d8bfd; --c2:#8f7bff; --c3:#f4a259; --c4:#f472b6;
+  --grad:linear-gradient(120deg,var(--c1),var(--c2));
+  --sans:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:Consolas,"SF Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:radial-gradient(1000px 520px at 85% -8%,rgba(143,123,255,.14),transparent 58%),radial-gradient(860px 480px at -8% 8%,rgba(77,139,253,.12),transparent 55%),var(--bg);color:var(--ink);line-height:1.65}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+nav{position:sticky;top:0;z-index:20;backdrop-filter:blur(14px);background:rgba(255,255,255,.82);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;gap:14px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.brand img{width:30px;height:30px;border-radius:8px;box-shadow:0 4px 12px rgba(30,60,120,.15)}
+.brand .sub{font-size:11px;color:var(--sub);font-weight:500;letter-spacing:.5px}
+.links{margin-left:auto;display:flex;gap:6px;font-size:14px;color:var(--sub)}
+.links a{padding:7px 15px;border-radius:999px;transition:background .2s,color .2s}
+.links a:hover{color:var(--ink);background:rgba(77,139,253,.12)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:999px;background:var(--grad);color:#fff;font-size:14px;font-weight:600;box-shadow:0 10px 26px rgba(113,120,255,.32)}
+.hero{padding:72px 0 44px;position:relative;overflow:hidden}
+.hero .tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:2px;color:#2a7df0;border:1px solid rgba(77,139,253,.4);background:rgba(77,139,253,.08);padding:5px 12px;border-radius:999px}
+.hero h1{font-size:52px;line-height:1.12;margin:20px 0 14px;font-weight:800;letter-spacing:.5px}
+.hero h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.lead{font-size:17px;color:var(--sub);max-width:640px}
+.hero .cta{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap}
+.ghost{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:999px;border:1px solid var(--line);color:var(--sub);font-size:14px;font-weight:600;background:#fff}
+.ghost:hover{color:var(--ink);border-color:rgba(77,139,253,.4)}
+.wave{position:absolute;right:-40px;top:44px;opacity:.6;pointer-events:none}
+section{padding:46px 0 12px}
+.sec-head{margin-bottom:22px}
+.sec-head .no{font-family:var(--mono);color:var(--c4);font-size:13px;letter-spacing:2px}
+.sec-head h2{font-size:28px;font-weight:800;margin-top:4px}
+.sec-head p{color:var(--sub);margin-top:6px;max-width:680px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 26px rgba(30,60,120,.06)}
+.card .ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px}
+.card h3{font-size:16px;margin-bottom:8px}
+.card p{font-size:13.5px;color:var(--sub)}
+.card code{font-family:var(--mono);font-size:12px;color:#2a7df0;background:rgba(77,139,253,.12);padding:2px 7px;border-radius:6px}
+.steps{display:flex;flex-wrap:wrap;gap:12px;counter-reset:st}
+.step{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;position:relative;box-shadow:0 8px 26px rgba(30,60,120,.06)}
+.step b{display:block;font-size:15px;margin:10px 0 4px}
+.step span{font-size:12.5px;color:var(--sub)}
+.step::before{counter-increment:st;content:"0" counter(st);font-family:var(--mono);color:var(--c2);font-weight:700;font-size:13px}
+.mode{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mode .card{border-top:3px solid transparent}
+.mode .card.course{border-top-color:var(--c1)}
+.mode .card.strict{border-top-color:var(--c2)}
+.pre{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--ink);font-family:var(--mono);white-space:pre-wrap;margin-top:10px}
+.arrow{color:var(--c4);margin:6px 0;font-size:12px}
+.list{display:grid;gap:8px}
+.list .row{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:13.5px;box-shadow:0 4px 14px rgba(30,60,120,.04)}
+.list .row code{margin-left:auto}
+.faq{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq details:last-child{border-bottom:none}
+.faq summary{cursor:pointer;padding:15px 18px;font-size:14.5px;font-weight:600;list-style:none}
+.faq summary::before{content:"Q  ";color:var(--c3);font-family:var(--mono)}
+.faq p{padding:0 18px 16px;font-size:13.5px;color:var(--sub)}
+footer{border-top:1px solid var(--line);margin-top:54px;padding:30px 0 46px;color:var(--dim);font-size:12.5px}
+footer b{color:var(--sub)}
+@media(max-width:900px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.mode{grid-template-columns:1fr}.hero h1{font-size:36px}.links{display:none}}
+</style>
+</head>
+<body>
+<nav><div class="wrap nav-in">
+  <div class="brand"><img src="icon.png" alt="BY配音"><div>BY配音<span class="sub">AI 配音工作台</span></div></div>
+  <div class="links">
+    <a href="#flow">工作流程</a><a href="#modes">字幕模式</a><a href="#voice">音色</a><a href="#output">输出物</a><a href="#start">开始使用</a>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="wrap">
+  <span class="tag">Windows · 便携版 · 本地离线字幕对齐</span>
+  <h1>把逐字稿，<br>变成 <em>配音 + 字幕 + 剪映草稿</em>。</h1>
+  <p class="lead">BY配音 是一款面向课程 / 批量内容的 AI 配音与字幕生成工具：输入逐字稿，产出配音音频与字幕文件，并可选自动写入本机剪映草稿。</p>
+  <div class="cta">
+    <a class="pill" href="#start">如何使用 ↗</a>
+    <a class="ghost" href="#flow">先看工作流程</a>
+  </div>
+</div>
+<svg class="wave" width="520" height="160" viewBox="0 0 520 160" fill="none"><path d="M0 120 Q40 60 80 120 T160 120 T240 120 T320 120 T400 120 T480 120 T520 120" stroke="#8f7bff" stroke-width="2"/><path d="M0 140 Q40 100 80 140 T160 140 T240 140 T320 140 T400 140 T480 140 T520 140" stroke="#4d8bfd" stroke-width="1.5" opacity=".55"/></svg>
+</header>
+
+<section id="flow"><div class="wrap sec-head">
+  <span class="no">01 · FLOW</span><h2>一条流水线，产出四样东西</h2>
+  <p>逐字稿 → 分段配音 → 合并音频 → 字幕对齐 →（可选）写入剪映草稿。</p>
+</div><div class="wrap steps">
+  <div class="step"><b>选逐字稿</b><span>.txt 文本，逐行或按段切句</span></div>
+  <div class="step"><b>选音色</b><span>扫描或填写克隆音色 speaker_id</span></div>
+  <div class="step"><b>选字幕模式</b><span>course 短字幕 / strict 严格逐字</span></div>
+  <div class="step"><b>设置样式</b><span>字体 · 字号 · 描边</span></div>
+  <div class="step"><b>开始生成</b><span>进度条 + 状态栏实时反馈</span></div>
+</div></section>
+
+<section id="modes"><div class="wrap sec-head">
+  <span class="no">02 · MODES</span><h2>两种字幕模式</h2>
+  <p>同一个逐字稿，两种切法。字幕文字始终来自你的逐字稿，不是识别结果。</p>
+</div><div class="wrap mode">
+  <div class="card course"><h3>🎬 course · 课程模式</h3><p>按句意、标点与最大字数切成课程短字幕，并去掉标点。</p><div class="pre">先打开工具，点击新建任务。</div><div class="arrow">↓ 输出</div><div class="pre">先打开工具\n点击新建任务</div></div>
+  <div class="card strict"><h3>📄 strict · 严格模式</h3><p>每一行/每一段逐字稿原样保留为字幕文本，标点也保留。</p><div class="pre">先打开工具，点击新建任务。</div><div class="arrow">↓ 输出</div><div class="pre">先打开工具，点击新建任务。</div></div>
+</div></section>
+
+<section id="voice"><div class="wrap sec-head">
+  <span class="no">03 · VOICE</span><h2>音色 speaker_id</h2>
+  <p>不通过上传声音克隆；使用你在剪映账号里已经创建 / 使用过的克隆音色。</p>
+</div><div class="wrap grid g3">
+  <div class="card"><div class="ic" style="background:rgba(77,139,253,.14)">🎙</div><h3>在剪映选音色</h3><p>先选中目标音色，随便生成一句测试配音。</p></div>
+  <div class="card"><div class="ic" style="background:rgba(244,162,89,.16)">🔍</div><h3>扫描音色 ID</h3><p>回到 BY配音 点「扫描音色 ID」，选中候选或注册成别名。</p></div>
+  <div class="card"><div class="ic" style="background:rgba(244,114,182,.14)">🏷</div><h3>注册别名</h3><p>把常用 <code>speaker_id</code> 保存成别名，下次直接调用。</p></div>
+</div></section>
+
+<section id="output"><div class="wrap sec-head">
+  <span class="no">04 · OUTPUT</span><h2>生成目录里有什么</h2>
+  <p>一次生成，交付与导入所需的文件都已就位。</p>
+</div><div class="wrap list">
+  <div class="row"><span>🎵 完整配音音频</span><code>voiceover.ogg</code></div>
+  <div class="row"><span>📝 通用字幕</span><code>subtitles.srt</code></div>
+  <div class="row"><span>🎨 带样式字幕</span><code>subtitles.ass</code></div>
+  <div class="row"><span>🧩 分段音频</span><code>segments/</code></div>
+  <div class="row"><span>📋 片段清单 / 生成报告</span><code>manifest.csv · report.json</code></div>
+</div></section>
+
+<section id="start"><div class="wrap sec-head">
+  <span class="no">05 · START</span><h2>开始使用</h2>
+  <p>便携版，解压即用，无需安装 Python / ffmpeg / 其他命令行依赖。</p>
+</div><div class="wrap grid g2">
+  <div class="card"><h3>① 解压并启动</h3><p>解压 <code>BY配音.zip</code>，双击 <code>启动BY配音.vbs</code>。</p></div>
+  <div class="card"><h3>② 环境要求</h3><p>Windows · 已装剪映专业版 · 网络可访问配音接口 · 拥有可用 <code>speaker_id</code>。</p></div>
+</div>
+<div class="wrap" style="margin-top:22px"><div class="faq">
+  <details><summary>字幕和逐字稿不一致怎么办？</summary><p>改用 <code>strict</code> 严格模式；课程模式会主动去标点、切短句。</p></details>
+  <details><summary>自动写入剪映草稿失败？</summary><p>确认本机已装剪映专业版、草稿目录存在、有写入权限，草稿名不含特殊字符。手动导入 voiceover.ogg + subtitles.srt 也能交付。</p></details>
+  <details><summary>扫描不到音色 ID？</summary><p>先用目标音色再生成一句测试配音，然后重新扫描。</p></details>
+</div></div>
+</section>
+
+<footer><div class="wrap">
+  <p><b>BY配音</b> · 本地 Windows 便携配音与字幕工具。逐字稿会发送到配音接口生成音频，请勿输入不适合上传的敏感内容；仅使用你本人有权限的音色。依赖第三方软件与接口，接口变化时可能需要更新。</p>
+  <p style="margin-top:10px">BY配音 · AI 配音工作台（展示型样稿 v2 · 清新主题）</p>
+</div></footer>
+</body>
+</html>

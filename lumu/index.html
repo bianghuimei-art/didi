@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>橹穆 · AI 工作台</title>
+<style>
+/* ===== 主题变量（明星组隔离：本组只有橹穆的 2 套主题） ===== */
+:root{ --bg:#eaf6f2; --card:#ffffff; --ink:#173a31; --sub:#4f7a6e; --accent:#0e9f83; --accent2:#5fc9b1; --deco:#cdeee3; --title-font:'Georgia',serif; --shadow:0 10px 30px rgba(23,58,49,.10); }
+.theme-sunny{ --bg:#fdf3e4; --card:#fffdf8; --ink:#4a3010; --sub:#8a6a3a; --accent:#e8862e; --accent2:#f5b97e; --deco:#fbe3c2; --title-font:'Georgia',serif; --shadow:0 10px 30px rgba(74,48,16,.10); }
+/* ===== 🩵💗 蓝粉卡片主题（卡片式 · 蓝→粉渐变） ===== */
+.theme-bluepink{
+  --bg:#eef3ff;                                   /* 顶栏混色用底色 */
+  --bg-grad:linear-gradient(165deg,#e8f1ff 0%,#fdf0f7 52%,#fdeefb 100%);
+  --card:#ffffff;
+  --ink:#322e52;
+  --sub:#7b76a0;
+  --accent:#4f7df9;   /* 蓝 */
+  --accent2:#f472b6;  /* 粉 */
+  --deco:#e4edff;
+  --title-font:'Georgia',serif;
+  --shadow:0 12px 32px rgba(79,125,249,.13);
+}
+body.theme-bluepink{ background:var(--bg-grad); }
+body.theme-bluepink .side-toggle{ background:linear-gradient(120deg,#5b8cff,#f472b6);border:none;color:#fff; }
+body.theme-bluepink .card,
+body.theme-bluepink .sign-card,
+body.theme-bluepink .moment,
+body.theme-bluepink .work-card,
+body.theme-bluepink .member-card,
+body.theme-bluepink .stage,
+body.theme-bluepink .step,
+body.theme-bluepink .q-card,
+body.theme-bluepink .chat-box,
+body.theme-bluepink .chat-input input,
+body.theme-bluepink nav.tabs button{
+  border-radius:20px;
+  border:1px solid rgba(255,255,255,.75);
+  box-shadow:0 14px 34px rgba(79,125,249,.12), 0 2px 10px rgba(244,114,182,.10);
+}
+/* 渐变标题/名字 */
+body.theme-bluepink .cp-name,
+body.theme-bluepink .section-title{
+  background:linear-gradient(115deg,#3b6df0 10%,#ec4899 90%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+body.theme-bluepink .sign-card .quote{ color:var(--ink); }
+/* 渐变强调按钮/激活态 */
+body.theme-bluepink .btn,
+body.theme-bluepink .chat-input button,
+body.theme-bluepink .theme-switch button.active,
+body.theme-bluepink .persona-pick button.active,
+body.theme-bluepink nav.tabs button.active{
+  background:linear-gradient(120deg,#5b8cff,#f472b6);
+  border:none;color:#fff;
+}
+body.theme-bluepink .theme-switch button,
+body.theme-bluepink .persona-pick button{ border-color:#aebcf5; }
+/* 日签卡渐变顶光 + 首页氛围光 */
+body.theme-bluepink .sign-card::before{
+  background:linear-gradient(160deg,rgba(91,140,255,.28),rgba(244,114,182,.22) 70%,transparent);
+}
+body.theme-bluepink .hero{ position:relative; }
+body.theme-bluepink .hero::before{
+  content:'';position:absolute;left:50%;top:34%;width:360px;height:360px;transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(91,140,255,.22),rgba(244,114,182,.20) 58%,transparent 72%);
+  border-radius:50%;filter:blur(8px);pointer-events:none;
+}
+body.theme-bluepink .hero > *{ position:relative; }
+/* 小徽章与引用卡 */
+body.theme-bluepink .badge{ background:linear-gradient(120deg,#e4edff,#fde8f3); border:none; }
+body.theme-bluepink .q-card::after{ color:#f3c6de; }
+body.theme-bluepink .member-card{ border-left:4px solid; border-image:linear-gradient(180deg,#5b8cff,#f472b6) 1; }
+body.theme-bluepink .tl-item::before{ background:linear-gradient(135deg,#5b8cff,#f472b6); }
+body.theme-bluepink .step .num{ background:linear-gradient(135deg,#5b8cff,#f472b6); }
+body.theme-bluepink .stage{ border-top:3px solid transparent; border-image:linear-gradient(90deg,#5b8cff,#f472b6) 1; }
+body.theme-bluepink footer .warn{ border-color:#c9b8e8; }
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'PingFang SC','Microsoft YaHei',sans-serif;transition:background .4s,color .4s;min-height:100vh}
+/* 全局背景层（75% 透明度的背景图，固定铺满，置于最下层；所有页面包括首页均可见） */
+body::before{content:'';position:fixed;inset:0;background:url('photos/lumu-bg.jpg') center/cover no-repeat;opacity:.75;z-index:0;pointer-events:none}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 20px 70px}
+
+/* 侧边栏（原顶栏内容收纳于此） */
+.side-toggle{position:fixed;top:10px;left:14px;z-index:40;width:42px;height:42px;border-radius:12px;border:1.5px solid var(--accent);background:var(--card);color:var(--ink);font-size:17px;cursor:pointer;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;transition:.2s}
+.side-toggle:hover{border-color:var(--accent2);transform:scale(1.05)}
+.side-mask{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:25;opacity:0;pointer-events:none;transition:opacity .3s}
+body.sidebar-open .side-mask{opacity:1;pointer-events:auto}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:272px;z-index:30;background:var(--card);box-shadow:4px 0 30px rgba(0,0,0,.18);transform:translateX(-100%);transition:transform .3s;padding:18px;overflow-y:auto}
+body.sidebar-open .sidebar{transform:translateX(0)}
+.side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.side-brand{font-family:var(--title-font);font-size:18px;letter-spacing:2px;font-weight:700;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.side-close{border:none;background:transparent;color:var(--sub);font-size:18px;cursor:pointer;padding:4px 8px}
+.side-close:hover{color:var(--ink)}
+.side-section-title{margin:14px 0 8px;font-size:12px;color:var(--sub);letter-spacing:1px}
+.side-links{display:flex;flex-direction:column;gap:8px}
+.side-links a{font-size:12.5px;padding:9px 14px;border-radius:12px;background:var(--deco);color:var(--ink);text-decoration:none;border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);transition:.2s}
+.side-links a:hover{border-color:var(--accent);transform:translateX(2px)}
+.side-themes .theme-switch{flex-direction:column;align-items:stretch}
+.side-themes .theme-switch button{width:100%;padding:8px 14px}
+.side-foot{margin-top:20px;font-size:11px;color:var(--sub);line-height:1.8;border-top:1px dashed color-mix(in srgb,var(--sub) 30%,transparent);padding-top:12px}
+.theme-switch{display:flex;gap:8px}
+.theme-switch button{border:1.5px solid var(--accent);background:transparent;color:var(--ink);border-radius:999px;padding:5px 14px;font-size:12px;cursor:pointer;transition:.2s}
+.theme-switch button.active,.theme-switch button:hover{background:var(--accent);color:#fff}
+
+/* 导航 tabs */
+nav.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:58px 0 6px}
+nav.tabs button{flex:1 1 auto;min-width:104px;text-align:center;border:none;background:var(--card);color:var(--sub);border-radius:12px;padding:10px 12px;font-size:13px;cursor:pointer;box-shadow:0 2px 8px color-mix(in srgb,var(--ink) 6%,transparent);transition:.2s}
+nav.tabs button.active{background:var(--accent);color:#fff}
+.tab-note{font-size:11px;color:var(--sub);margin:4px 0 14px}
+
+/* 通用区块 */
+.section{display:none;animation:fade .35s}
+.section.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.section-title{margin:28px 0 14px;font-size:19px;letter-spacing:2px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:'';flex:1;height:1px;background:color-mix(in srgb,var(--accent) 35%,transparent)}
+.card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+
+/* 首页 */
+.hero{text-align:center;padding:46px 16px 30px}
+.hero .cp-name{font-family:var(--title-font);font-size:54px;letter-spacing:8px;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .sub-line{margin-top:12px;color:var(--sub);font-size:14px;line-height:1.9}
+.member-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:22px}
+.member-card{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);border-left:4px solid var(--accent)}
+.member-card b{font-size:15px}
+.member-card .role{display:inline-block;font-size:11px;background:var(--deco);border-radius:999px;padding:2px 10px;margin-left:6px}
+.member-card p{font-size:12px;color:var(--sub);margin-top:6px;line-height:1.8}
+
+/* 首页双人照片分屏（整体放大，撑满可视高度） */
+.split{display:grid;grid-template-columns:1fr auto 1fr;height:max(460px,calc(100vh - 205px));margin-top:6px;border-radius:22px;overflow:hidden;box-shadow:var(--shadow)}
+.split-half{position:relative;overflow:hidden;display:block;cursor:pointer}
+.split-half img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.split-half:hover img{transform:scale(1.05)}
+.split-half::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.74));pointer-events:none}
+.split-overlay{position:absolute;left:18px;right:18px;bottom:16px;color:#fff;z-index:2;text-shadow:0 1px 5px rgba(0,0,0,.45)}
+.split-overlay .role-badge{display:inline-block;font-size:12px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:3px 12px;backdrop-filter:blur(4px)}
+.split-overlay .name{font-size:32px;font-weight:700;font-family:var(--title-font);margin-top:8px;letter-spacing:3px}
+.split-overlay .sub{font-size:13.5px;margin-top:5px;opacity:.96}
+.split-overlay .sub2{font-size:12px;margin-top:3px;opacity:.8}
+.split-divider{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:var(--card);color:var(--accent);font-weight:700;font-family:var(--title-font);padding:0 10px;z-index:3;box-shadow:0 0 26px rgba(0,0,0,.28)}
+.split-divider .big{font-size:20px;letter-spacing:2px}
+.split-divider .small{font-size:10px;color:var(--sub);letter-spacing:1px;writing-mode:vertical-rl}
+.hero-caption{text-align:center;margin-top:16px;color:var(--sub);font-size:13px;letter-spacing:2px}
+.photo-note{margin-top:8px;text-align:center;font-size:11px;color:color-mix(in srgb,var(--sub) 75%,transparent)}
+@media (max-width:640px){
+  .split{grid-template-columns:1fr;height:auto}
+  .split-divider{flex-direction:row;padding:10px 0}
+}
+
+/* 日签 */
+.sign-card{max-width:520px;margin:10px auto;padding:36px 30px;border-radius:20px;background:var(--card);box-shadow:var(--shadow);text-align:center;position:relative;overflow:hidden}
+.sign-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 0%,var(--deco),transparent 60%)}
+.sign-card .tag{position:relative;font-size:12px;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 14px;display:inline-block}
+.sign-card .quote{position:relative;margin-top:20px;font-size:22px;line-height:1.9;font-family:var(--title-font)}
+.sign-card .who{position:relative;margin-top:12px;font-size:13px;color:var(--sub)}
+.sign-card .src{position:relative;margin-top:6px;font-size:11px;color:color-mix(in srgb,var(--sub) 85%,transparent)}
+.sign-card .btn{position:relative;margin-top:20px;border:none;background:var(--accent);color:#fff;padding:9px 26px;border-radius:999px;cursor:pointer;font-size:14px}
+.sign-card .btn:hover{filter:brightness(1.08)}
+
+/* 金句墙 */
+.quote-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.q-card{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.q-card::after{content:'❝';position:absolute;right:10px;top:4px;font-size:44px;color:var(--deco);font-family:serif}
+.q-card .txt{font-size:14px;line-height:1.8;font-family:var(--title-font)}
+.q-card .who{font-size:12px;color:var(--sub);margin-top:10px}
+.q-card .occ{font-size:11px;color:color-mix(in srgb,var(--sub) 80%,transparent);margin-top:4px}
+
+/* 名场面/时间线/舞台/路线 */
+.moment-list{display:flex;flex-direction:column;gap:12px}
+.moment{background:var(--card);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+.moment .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.moment .t b{font-size:15px}
+.moment .badge{font-size:11px;background:var(--deco);border-radius:999px;padding:2px 10px;color:var(--ink)}
+.moment .badge.warn{background:color-mix(in srgb,#e05c5c 14%,var(--card));color:#b04040;border:1px solid #e05c5c55}
+.moment p{font-size:13px;color:var(--sub);margin-top:8px;line-height:1.8}
+.moment .src{font-size:11px;color:color-mix(in srgb,var(--sub) 80%,transparent);margin-top:6px}
+
+.timeline{position:relative;padding-left:22px}
+.timeline::before{content:'';position:absolute;left:6px;top:4px;bottom:4px;width:2px;background:var(--deco)}
+.tl-item{position:relative;margin-bottom:16px}
+.tl-item::before{content:'';position:absolute;left:-21px;top:5px;width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.tl-item .date{font-size:12px;color:var(--accent);font-weight:700}
+.tl-item b{font-size:14px}
+.tl-item p{font-size:12.5px;color:var(--sub);margin-top:4px;line-height:1.7}
+
+.stage-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.stage{background:var(--card);border-radius:14px;padding:16px;box-shadow:var(--shadow);border-top:3px solid var(--accent)}
+.stage b{font-size:14px}
+.stage p{font-size:12.5px;color:var(--sub);margin-top:6px;line-height:1.8}
+.stage .note{font-size:11px;color:color-mix(in srgb,var(--sub) 80%,transparent);margin-top:8px;border-top:1px dashed color-mix(in srgb,var(--sub) 30%,transparent);padding-top:6px}
+
+.step-list{counter-reset:step}
+.step{display:flex;gap:14px;margin-bottom:14px;background:var(--card);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.step .num{counter-increment:step;flex:0 0 34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.step .num::before{content:counter(step)}
+.step b{font-size:14px}
+.step p{font-size:12.5px;color:var(--sub);margin-top:5px;line-height:1.7}
+.step-links{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+.step-link{display:inline-block;font-size:12px;padding:5px 14px;border-radius:999px;background:var(--deco);color:var(--ink);text-decoration:none;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);transition:.2s}
+.step-link:hover{border-color:var(--accent)}
+
+/* 动态墙 */
+.feed-note{font-size:12px;color:var(--sub);line-height:1.9;padding:14px 18px}
+.feed-sub{margin:22px 0 10px;font-size:14px;color:var(--sub)}
+.feed-official{display:flex;flex-wrap:wrap;gap:10px}
+.feed-official a{display:inline-block;font-size:12.5px;padding:8px 16px;border-radius:999px;background:var(--card);color:var(--ink);text-decoration:none;box-shadow:0 3px 10px color-mix(in srgb,var(--ink) 7%,transparent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);transition:.2s}
+.feed-official a:hover{border-color:var(--accent)}
+.feed-filter{display:flex;gap:8px;flex-wrap:wrap}
+.feed-filter button{border:1.5px solid var(--accent);background:transparent;color:var(--ink);border-radius:999px;padding:5px 14px;font-size:12px;cursor:pointer;transition:.2s}
+.feed-filter button.active,.feed-filter button:hover{background:var(--accent);color:#fff}
+.feed-list{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.feed-item{background:var(--card);border-radius:14px;padding:15px 18px;box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start}
+.feed-item .badge-plat{flex:0 0 auto;font-size:11px;padding:3px 10px;border-radius:999px;background:var(--deco);color:var(--ink);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.feed-item .badge-plat.warn{background:color-mix(in srgb,#e05c5c 12%,var(--card));color:#b04040;border-color:#e05c5c55}
+.feed-item .body{flex:1}
+.feed-item .t{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.feed-item .t b{font-size:14px}
+.feed-item .t .date{font-size:11px;color:var(--sub)}
+.feed-item .t .who{font-size:11px;color:var(--accent)}
+.feed-item p{font-size:12.5px;color:var(--sub);margin-top:5px;line-height:1.8}
+.feed-item .src{font-size:11px;color:color-mix(in srgb,var(--sub) 80%,transparent);margin-top:6px}
+.feed-item .src a{color:var(--accent);text-decoration:none}
+.feed-item .src a:hover{text-decoration:underline}
+.src-link{color:var(--accent);text-decoration:none;white-space:nowrap}
+.src-link:hover{text-decoration:underline}
+
+/* 打卡面板 */
+.ck-note{font-size:12px;color:var(--sub);line-height:1.9;padding:14px 18px}
+.ck-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}
+.ck-stat{background:var(--card);border-radius:14px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.ck-stat .v{font-size:26px;font-weight:700;background:linear-gradient(120deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.ck-stat .k{font-size:12px;color:var(--sub);margin-top:4px}
+.ck-tasks{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.ck-task{background:var(--card);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ck-task .ico{font-size:22px}
+.ck-task .info{flex:1;min-width:200px}
+.ck-task .info b{font-size:14px}
+.ck-task .info p{font-size:12px;color:var(--sub);margin-top:3px;line-height:1.6}
+.ck-task .acts{display:flex;gap:8px}
+.ck-task .acts a,.ck-task .acts button{border:none;border-radius:999px;padding:7px 16px;font-size:12.5px;cursor:pointer;text-decoration:none;transition:.2s}
+.ck-task .acts .go{background:var(--deco);color:var(--ink)}
+.ck-task .acts .go:hover{border:1px solid var(--accent)}
+.ck-task .acts .done{background:transparent;border:1.5px solid var(--accent);color:var(--accent)}
+.ck-task .acts .done.on{background:var(--accent);color:#fff}
+.ck-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+.ck-day{aspect-ratio:1;border-radius:10px;background:var(--card);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--sub);box-shadow:0 2px 6px color-mix(in srgb,var(--ink) 5%,transparent)}
+.ck-day.full{background:var(--accent);color:#fff}
+.ck-day.part{background:var(--deco);color:var(--ink)}
+.ck-day.today{outline:2px solid var(--accent2)}
+
+/* AI 对话 */
+.chat-box{background:var(--card);border-radius:16px;box-shadow:var(--shadow);height:360px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:78%;padding:10px 14px;border-radius:14px;font-size:13.5px;line-height:1.8}
+.msg.bot{background:var(--deco);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--accent);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.chat-input{display:flex;gap:10px;margin-top:12px}
+.chat-input input{flex:1;padding:12px 16px;border-radius:12px;border:1.5px solid color-mix(in srgb,var(--accent) 40%,transparent);background:var(--card);color:var(--ink);font-size:14px;outline:none}
+.chat-input input:focus{border-color:var(--accent)}
+.chat-input button{border:none;background:var(--accent);color:#fff;padding:0 24px;border-radius:12px;cursor:pointer;font-size:14px}
+.chat-warn{font-size:11px;color:var(--sub);margin-top:8px;text-align:center}
+.persona-pick{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.persona-pick button{border:1.5px solid var(--accent);background:transparent;color:var(--ink);border-radius:999px;padding:6px 14px;font-size:12px;cursor:pointer;transition:.2s}
+.persona-pick button.active,.persona-pick button:hover{background:var(--accent);color:#fff}
+.msg-sender{font-size:11px;color:var(--accent);margin-bottom:4px;font-weight:700}
+.chat-hint{font-size:11px;color:var(--sub);margin-top:8px;line-height:1.8}
+
+/* 免责 */
+footer{margin-top:46px;text-align:center;font-size:12px;color:var(--sub);line-height:2}
+footer .warn{display:inline-block;margin-top:8px;font-size:11px;border:1px dashed color-mix(in srgb,var(--sub) 50%,transparent);border-radius:6px;padding:4px 14px}
+</style>
+</head>
+<body>
+
+<button class="side-toggle" onclick="toggleSidebar()" title="菜单">☰</button>
+<div class="side-mask" id="sideMask" onclick="toggleSidebar(false)"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="side-head">
+    <div class="side-brand">橹穆 · AI 工作台</div>
+    <button class="side-close" onclick="toggleSidebar(false)" title="关闭">✕</button>
+  </div>
+  <div class="side-section-title">🔗 追溯链接</div>
+  <div class="side-links" id="sideLinks"></div>
+  <div class="side-section-title">🎨 主题</div>
+  <div class="side-themes">
+    <div class="theme-switch">
+      <button data-theme="theme-mint" class="active">🌿 暗恋薄荷</button>
+      <button data-theme="theme-sunny">☀️ 哥狗暖阳</button>
+      <button data-theme="theme-bluepink">🩵💗 蓝粉卡片</button>
+    </div>
+  </div>
+  <div class="side-foot">数据为手动整理快照 · 糖点可追溯 · 粉丝叙事已标注 · AI 模拟仅供娱乐</div>
+</aside>
+
+<div class="wrap">
+  <nav class="tabs">
+    <button data-tab="home" class="active">🏠 首页</button>
+    <button data-tab="checkin">📅 打卡</button>
+    <button data-tab="feed">📮 动态</button>
+    <button data-tab="chat">💬 AI 对话</button>
+    <button data-tab="quotes">💬 语录</button>
+    <button data-tab="moments">📖 名场面</button>
+    <button data-tab="history">⏳ 历程</button>
+    <button data-tab="guide">🧭 考古路线</button>
+  </nav>
+  <p class="tab-note">语料来源：idol-distiller 蒸馏产物（lumu-* skills）· 糖点可追溯 · 粉丝叙事已标注</p>
+
+  <!-- 首页：双人照片分屏（左穆祉丞 · 右王橹杰） -->
+  <section id="tab-home" class="section active">
+    <div class="split">
+      <a class="split-half" href="https://s.weibo.com/weibo?q=TF_ING%E7%A9%86%E7%A5%89%E4%B8%9EMUA" target="_blank" rel="noopener" title="穆祉丞微博">
+        <img src="photos/穆祉丞.jpg" alt="穆祉丞">
+        <div class="split-overlay">
+          <span class="role-badge">🐺 小总统 · 师兄</span>
+          <div class="name">穆祉丞</div>
+          <div class="sub">TF三代（TF_ING）· 昵称恩仔</div>
+          <div class="sub2">@TF_ING穆祉丞MUA</div>
+        </div>
+      </a>
+      <div class="split-divider">
+        <span class="big">橹穆</span>
+        <span class="small">暗恋系 × 哥狗味</span>
+      </div>
+      <a class="split-half" href="https://s.weibo.com/weibo?q=TF%E5%AE%B6%E6%97%8F-%E7%8E%8B%E6%A9%B9%E6%9D%B0LJW" target="_blank" rel="noopener" title="王橹杰微博">
+        <img src="photos/王橹杰.jpg" alt="王橹杰">
+        <div class="split-overlay">
+          <span class="role-badge">🐶 大总统 · 师弟</span>
+          <div class="name">王橹杰</div>
+          <div class="sub">TF四代 · 主唱 · 2010-01-08</div>
+          <div class="sub2">@TF家族-王橹杰LJW</div>
+        </div>
+      </a>
+    </div>
+    <p class="hero-caption">「暗恋系 CP」· 哥狗味 · 橹穆国 —— 点击任意一侧直达本人微博</p>
+    <p class="photo-note">照片为本地文件（photos/）· 版权归原权利人 · 仅供个人学习/娱乐</p>
+  </section>
+
+  <!-- 语录（日签 + 金句墙合并） -->
+  <section id="tab-quotes" class="section">
+    <h2 class="section-title">💬 日签 · 金句墙</h2>
+    <div class="sign-card">
+      <span class="tag">今日橹穆</span>
+      <div class="quote" id="dailyQuote"></div>
+      <div class="who" id="dailyWho"></div>
+      <div class="src" id="dailySrc"></div>
+      <button class="btn" onclick="nextQuote()">换一张</button>
+    </div>
+    <div class="quote-wall" id="quoteWall"></div>
+  </section>
+
+  <!-- 名场面 -->
+  <section id="tab-moments" class="section">
+    <h2 class="section-title">📖 名场面 · 糖点百科</h2>
+    <div class="moment-list" id="momentList"></div>
+  </section>
+
+  <!-- 历程（时间线 + 舞台百科合并） -->
+  <section id="tab-history" class="section">
+    <h2 class="section-title">⏳ 故事时间线</h2>
+    <div class="timeline" id="timelineBox"></div>
+    <h2 class="section-title">🎬 合作舞台百科</h2>
+    <div class="stage-grid" id="stageGrid"></div>
+  </section>
+
+  <!-- 动态墙 -->
+  <section id="tab-feed" class="section">
+    <h2 class="section-title">📮 动态墙 · 网上动态速览</h2>
+    <div class="feed-note card" id="feedNote"></div>
+    <h3 class="feed-sub">🔗 平台官方入口</h3>
+    <div class="feed-official" id="feedOfficial"></div>
+    <h3 class="feed-sub">🗂️ 按平台筛选</h3>
+    <div class="feed-filter" id="feedFilter"></div>
+    <div class="feed-list" id="feedList"></div>
+  </section>
+
+  <!-- 考古路线 -->
+  <section id="tab-guide" class="section">
+    <h2 class="section-title">🧭 考古路线图（新人入坑）</h2>
+    <div class="step-list" id="stepList"></div>
+  </section>
+
+  <!-- 打卡管理面板 -->
+  <section id="tab-checkin" class="section">
+    <h2 class="section-title">📅 追星打卡</h2>
+    <div class="ck-note card" id="ckNote"></div>
+    <div class="ck-stats" id="ckStats"></div>
+    <div class="ck-tasks" id="ckTasks"></div>
+    <h3 class="feed-sub">🗓️ 近 35 天打卡日历（绿=全完成 / 浅=部分 / 空=未打）</h3>
+    <div class="ck-cal" id="ckCal"></div>
+  </section>
+
+  <!-- AI 对话 -->
+  <section id="tab-chat" class="section">
+    <h2 class="section-title">💬 AI 双人对话</h2>
+    <div class="persona-pick">
+      <button data-persona="auto" class="active">🎭 自动（按称呼）</button>
+      <button data-persona="lujie">🐶 王橹杰 · 直球担当</button>
+      <button data-persona="zhicheng">🐺 穆祉丞 · 边界担当</button>
+    </div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="chat-input">
+      <input id="chatInput" placeholder="对师兄/师弟说点什么…（问候、聊天、问他们的经历都行）" onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()">发送</button>
+    </div>
+    <p class="chat-warn">⚠️ AI 人格模拟 · 仅供娱乐 · 台词基于公开语录、真实经历与风味框架生成，非本人发言</p>
+    <p class="chat-hint">💡 称呼决定和谁聊：提到「师兄/恩仔/祉丞」→ 穆祉丞；提到「橹橹/橹杰/师弟」→ 王橹杰。<br>
+    可以试试：<b>「师兄，我今天有点累」</b> · <b>「橹橹，你生日是什么时候？」</b> · <b>「你俩谁更主动？」</b> · <b>「说说你们采访那次叮嘱」</b></p>
+  </section>
+
+  <footer>
+    橹穆 · AI 工作台 v1.0<br>
+    <span class="warn" id="disclaimer"></span>
+  </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+/* ===== 工具 ===== */
+var $ = function(id){ return document.getElementById(id); };
+
+/* ===== 主题（按明星组隔离：浏览器记住的主题若不属于本组 → 回退组默认） ===== */
+function applyShell(theme){
+  var cls = (theme === 'theme-mint' ? '' : theme);
+  if (document.body.classList.contains('sidebar-open')) cls += ' sidebar-open';
+  document.body.className = cls.trim();
+}
+function toggleSidebar(open){
+  var now = document.body.classList.contains('sidebar-open');
+  var next = (open === undefined) ? !now : !!open;
+  document.body.classList.toggle('sidebar-open', next);
+}
+(function(){
+  var saved = localStorage.getItem('lumu-theme');
+  var allowed = ['theme-mint','theme-sunny','theme-bluepink'];
+  var start = allowed.indexOf(saved) >= 0 ? saved : 'theme-mint';
+  applyShell(start);
+  document.querySelectorAll('.theme-switch button').forEach(function(b){
+    if(b.dataset.theme === start) b.classList.add('active');
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.theme-switch button').forEach(function(x){x.classList.remove('active')});
+      b.classList.add('active');
+      localStorage.setItem('lumu-theme', b.dataset.theme);
+      applyShell(b.dataset.theme);
+    });
+  });
+})();
+
+/* ===== Tabs ===== */
+document.querySelectorAll('nav.tabs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('nav.tabs button').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+    $('tab-' + b.dataset.tab).classList.add('active');
+  });
+});
+
+/* ===== 首页（双人照片分屏 · 静态布局） ===== */
+$('disclaimer').textContent = LUMU_DATA.meta.disclaimers[0];
+
+/* ===== 日签 ===== */
+var qi = 0;
+function renderQuote(i){
+  var it = LUMU_DATA.quotes[i];
+  $('dailyQuote').textContent = it.quote;
+  $('dailyWho').textContent = '—— ' + it.who + ' · ' + it.occasion;
+  var link = it.url ? ' · <a class="src-link" href="' + it.url + '" target="_blank" rel="noopener">来源 ↗</a>' : '';
+  $('dailySrc').innerHTML = '出处：' + it.src + link;
+}
+function nextQuote(){ qi = (qi + 1) % LUMU_DATA.quotes.length; renderQuote(qi); }
+renderQuote(0);
+
+/* ===== 金句墙 ===== */
+LUMU_DATA.quotes.forEach(function(q){
+  var d = document.createElement('div');
+  d.className = 'q-card';
+  var link = q.url ? ' · <a class="src-link" href="' + q.url + '" target="_blank" rel="noopener">来源 ↗</a>' : '';
+  d.innerHTML = '<div class="txt">' + q.quote + '</div><div class="who">—— ' + q.who + ' · ' + q.occasion + '（' + q.tag + '）</div><div class="occ">' + q.src + link + '</div>';
+  $('quoteWall').appendChild(d);
+});
+
+/* ===== 名场面 ===== */
+LUMU_DATA.moments.forEach(function(m){
+  var d = document.createElement('div');
+  d.className = 'moment';
+  var badge = m.controversy ? '<span class="badge warn">⚠️ 争议双面</span>' : '<span class="badge">名场面</span>';
+  var con = m.controversy ? '<p style="color:#b04040">争议：' + m.controversy + '</p>' : '';
+  var link = m.url ? ' · <a class="src-link" href="' + m.url + '" target="_blank" rel="noopener">来源 ↗</a>' : '';
+  d.innerHTML = '<div class="t"><b>' + m.title + '</b>' + badge + '<span class="badge">' + m.time + '</span></div><p>' + m.desc + '</p>' + con + '<div class="src">出处：' + m.src + link + '</div>';
+  $('momentList').appendChild(d);
+});
+
+/* ===== 时间线 ===== */
+LUMU_DATA.timeline.forEach(function(t){
+  var d = document.createElement('div');
+  d.className = 'tl-item';
+  var link = t.url ? ' <a class="src-link" href="' + t.url + '" target="_blank" rel="noopener">来源 ↗</a>' : '';
+  d.innerHTML = '<div class="date">' + t.date + '</div><b>' + t.title + '</b><p>' + t.desc + '（' + t.src + '）' + link + '</p>';
+  $('timelineBox').appendChild(d);
+});
+
+/* ===== 舞台百科 ===== */
+LUMU_DATA.stages.forEach(function(s){
+  var d = document.createElement('div');
+  d.className = 'stage';
+  var link = s.url ? '<div class="note">' + s.note + ' · <a class="src-link" href="' + s.url + '" target="_blank" rel="noopener">来源 ↗</a></div>' : '<div class="note">' + s.note + '</div>';
+  d.innerHTML = '<b>' + s.title + '</b><p>' + s.desc + '</p>' + link;
+  $('stageGrid').appendChild(d);
+});
+
+/* ===== 考古路线 ===== */
+LUMU_DATA.guideSteps.forEach(function(g){
+  var d = document.createElement('div');
+  d.className = 'step';
+  var links = (g.links || []).map(function(l){
+    return '<a class="step-link" href="' + l.url + '" target="_blank" rel="noopener">' + l.label + ' ↗</a>';
+  }).join('');
+  d.innerHTML = '<div class="num"></div><div><b>' + g.title + '</b><p>' + g.desc + '<br>入口：' + g.src + '</p>' + (links ? '<div class="step-links">' + links + '</div>' : '') + '</div>';
+  $('stepList').appendChild(d);
+});
+
+/* ===== 动态墙 ===== */
+var FEED = LUMU_DATA.feed;
+
+/* 侧边栏追溯链接（复用 feed.official 单一数据源） */
+(function(){
+  var box = $('sideLinks');
+  FEED.official.forEach(function(o){
+    var a = document.createElement('a');
+    a.href = o.url; a.target = '_blank'; a.rel = 'noopener';
+    a.textContent = (o.short || o.label);
+    a.title = o.label;
+    box.appendChild(a);
+  });
+})();
+var feedPlatforms = [];
+FEED.entries.forEach(function(e){ if (feedPlatforms.indexOf(e.platform) < 0) feedPlatforms.push(e.platform); });
+$('feedNote').textContent = '更新于 ' + FEED.updated + ' · ' + FEED.note;
+
+FEED.official.forEach(function(o){
+  var a = document.createElement('a');
+  a.href = o.url; a.target = '_blank'; a.rel = 'noopener';
+  a.textContent = '[' + o.platform + '] ' + o.label;
+  $('feedOfficial').appendChild(a);
+});
+
+var feedActive = '全部';
+var filterBtns = [];
+var fbAll = document.createElement('button');
+fbAll.textContent = '全部'; fbAll.classList.add('active'); fbAll.dataset.p = '全部';
+filterBtns.push(fbAll);
+feedPlatforms.forEach(function(p){
+  var b = document.createElement('button'); b.textContent = p; b.dataset.p = p;
+  filterBtns.push(b);
+});
+filterBtns.forEach(function(b){
+  b.addEventListener('click', function(){
+    feedActive = b.dataset.p;
+    filterBtns.forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    renderFeed();
+  });
+  $('feedFilter').appendChild(b);
+});
+
+function renderFeed(){
+  $('feedList').innerHTML = '';
+  FEED.entries.filter(function(e){ return feedActive === '全部' || e.platform === feedActive; })
+    .forEach(function(e){
+      var d = document.createElement('div');
+      d.className = 'feed-item';
+      var warn = e.platform === '争议' ? 'warn' : '';
+      d.innerHTML = '<span class="badge-plat ' + warn + '">' + e.platform + '</span>' +
+        '<div class="body"><div class="t"><b>' + e.title + '</b><span class="date">' + e.date + '</span><span class="who">' + e.member + '</span></div>' +
+        '<p>' + e.desc + '</p><div class="src">来源：' + e.srcNote + ' · <a href="' + e.url + '" target="_blank" rel="noopener">查看原文 ↗</a></div></div>';
+      $('feedList').appendChild(d);
+    });
+}
+renderFeed();
+
+/* ===== 打卡管理面板（合规版 · localStorage 本地记录） ===== */
+var CK = LUMU_DATA.checkin;
+var CK_KEY = 'lumu-checkin-records';
+$('ckNote').textContent = CK.note;
+
+function pad2(n){ return n < 10 ? '0' + n : '' + n; }
+function dayKey(d){ return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function todayStr(){ return dayKey(new Date()); }
+
+function loadRecords(){ try { return JSON.parse(localStorage.getItem(CK_KEY)) || {}; } catch(e){ return {}; } }
+function saveRecords(r){ localStorage.setItem(CK_KEY, JSON.stringify(r)); }
+function dayCount(r, k){ return (r[k] || []).length; }
+
+function toggleTask(id){
+  var r = loadRecords();
+  var t = todayStr();
+  r[t] = r[t] || [];
+  var i = r[t].indexOf(id);
+  if (i >= 0) r[t].splice(i, 1); else r[t].push(id);
+  saveRecords(r);
+  renderCheckin();
+}
+
+function calcStreak(r){
+  var streak = 0;
+  var d = new Date();
+  if (dayCount(r, dayKey(d)) === 0) d.setDate(d.getDate() - 1); /* 今天未打时从昨天起算（宽限） */
+  while (dayCount(r, dayKey(d)) > 0){ streak++; d.setDate(d.getDate() - 1); }
+  return streak;
+}
+
+function renderCheckin(){
+  var r = loadRecords();
+  var t = todayStr();
+  var today = r[t] || [];
+  var doneCount = today.length;
+  var totalTasks = CK.tasks.length;
+  $('ckStats').innerHTML =
+    '<div class="ck-stat"><div class="v">' + doneCount + '/' + totalTasks + '</div><div class="k">今日完成</div></div>' +
+    '<div class="ck-stat"><div class="v">' + calcStreak(r) + '</div><div class="k">连续打卡（天）</div></div>' +
+    '<div class="ck-stat"><div class="v">' + (function(){ var n=0; Object.keys(r).forEach(function(k){ n += (r[k]||[]).length; }); return n; })() + '</div><div class="k">累计打卡（次）</div></div>';
+  $('ckTasks').innerHTML = '';
+  CK.tasks.forEach(function(task){
+    var on = today.indexOf(task.id) >= 0;
+    var d = document.createElement('div');
+    d.className = 'ck-task';
+    var go = task.url ? '<a class="go" href="' + task.url + '" target="_blank" rel="noopener">去打卡 ↗</a>' : '<span class="go" style="padding:7px 16px;font-size:12.5px">平台内应用</span>';
+    d.innerHTML = '<div class="ico">' + task.icon + '</div><div class="info"><b>' + task.label + '</b><p>' + task.desc + '</p></div><div class="acts">' + go + '<button class="done' + (on ? ' on' : '') + '" onclick="toggleTask(\'' + task.id + '\')">' + (on ? '✓ 已打卡' : '打卡') + '</button></div>';
+    $('ckTasks').appendChild(d);
+  });
+  var cal = '';
+  var d = new Date();
+  for (var i = 34; i >= 0; i--){
+    var dd = new Date(d); dd.setDate(d.getDate() - i);
+    var k = dayKey(dd);
+    var c = dayCount(r, k);
+    var cls = c === 0 ? '' : (c >= totalTasks ? 'full' : 'part');
+    var isToday = k === t ? ' today' : '';
+    cal += '<div class="ck-day ' + cls + isToday + '">' + dd.getDate() + '</div>';
+  }
+  $('ckCal').innerHTML = cal;
+}
+renderCheckin();
+
+/* ===== AI 双人对话（人格版 · 融入真实经历细节） ===== */
+var PERSONAS = LUMU_DATA.chatPersona.personas;
+var RED_LINES = LUMU_DATA.chatPersona.redLines;
+var currentPersona = 'auto';
+
+function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+function addMsg(text, who, sender){
+  var d = document.createElement('div');
+  d.className = 'msg ' + (who === 'user' ? 'user' : 'bot');
+  var label = sender ? '<div class="msg-sender">' + sender + '</div>' : '';
+  d.innerHTML = label + '<div>' + text + '</div>';
+  $('chatBox').appendChild(d);
+  $('chatBox').scrollTop = $('chatBox').scrollHeight;
+}
+
+/* 人格选择器 */
+document.querySelectorAll('.persona-pick button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.persona-pick button').forEach(function(x){x.classList.remove('active')});
+    b.classList.add('active');
+    currentPersona = b.dataset.persona;
+  });
+});
+
+/* 称呼 -> 人格 */
+function detectPersona(t){
+  if (currentPersona !== 'auto') return currentPersona;
+  var z = PERSONAS.zhicheng, l = PERSONAS.lujie;
+  if (z.nick.some(function(n){ return t.indexOf(n) >= 0; })) return 'zhicheng';
+  if (l.nick.some(function(n){ return t.indexOf(n) >= 0; })) return 'lujie';
+  return null;
+}
+
+/* 意图识别 */
+function detectIntent(t){
+  if (/累|病|感冒|难受|不舒服|难过|辛苦|失眠|发烧|饿|困/.test(t)) return 'care';
+  if (/平时|爱好|喜欢干|爱干|日常|怎么样/.test(t)) return 'askExp';
+  if (/说过|原话|语录|那句话|叮嘱|不要感冒|照顾好自己/.test(t)) return 'askQuotes';
+  if (/名场面|糖点|高光|拉人墙|牵手|合照|互动|考古/.test(t)) return 'askMoments';
+  if (/风味|哥狗|暗恋|人设|关系|相处|怎么认识/.test(t)) return 'askFlavor';
+  if (/师兄|师弟|你俩|你们|年龄差|谁主动|谁更|跟着/.test(t)) return 'askRelation';
+  if (/可爱|夸|想你|抱|贴贴/.test(t)) return 'tease';
+  return 'fallback';
+}
+
+/* 事实问答：提取结构化事实（数据支撑） */
+function answerFromData(t){
+  if (/说过|原话|语录|金句|那句话|叮嘱|不要感冒|照顾好自己/.test(t)) {
+    return { topic: 'quotes', LIST: LUMU_DATA.quotes.map(function(x){ return x.who + '「' + x.quote + '」（' + x.occasion + '）'; }).join('；') };
+  }
+  if (/名场面|糖点|高光|拉人墙|牵手|合照|经典瞬间|五公/.test(t)) {
+    var kw = ['拉人墙', '牵手', '合照', '叮嘱', '年龄差', '泡泡', '糖点合集', '叫早', '五公'];
+    var hit = null;
+    kw.forEach(function(k){ if (t.indexOf(k) >= 0) hit = k; });
+    if (hit) {
+      var m = LUMU_DATA.moments.filter(function(x){ return x.title.indexOf(hit) >= 0 || x.desc.indexOf(hit) >= 0; })[0];
+      if (m) return { topic: 'moment', TITLE: m.title, DESC: m.desc, TIME: m.time, SRC: m.src, CON: m.controversy ? '；争议：' + m.controversy : '' };
+    }
+    return { topic: 'moments', LIST: LUMU_DATA.moments.map(function(m){ return m.title; }).join('、') };
+  }
+  if (/风味|哥狗|暗恋|人设|相处模式|关系模式/.test(t)) return { topic: 'flavor' };
+  if (/入坑|考古|路线|科普|从哪开始/.test(t)) return { topic: 'guide' };
+  if (/播放|数据|多火|破千万|美帝|3700|3800/.test(t)) return { topic: 'data' };
+  if (/动态|最近|近况|热搜|新动态|网上|最新/.test(t)) return { topic: 'feed', LIST: LUMU_DATA.feed.entries.slice(0, 3).map(function(x){ return x.date + ' · ' + x.platform + '「' + x.title + '」'; }).join('；') };
+  if (/生日|公开|基本信息|是谁|多大/.test(t)) return { topic: 'info', INFO: '王橹杰：2010-01-08（摩羯座），2022-10-06 公开，TF四代主唱，粉丝名 lumos。穆祉丞：TF_ING 三代师兄，昵称恩仔（生日待核实）。' };
+  return null;
+}
+
+/* 事实回答选人格：有称呼用称呼；提到某个人用那个人；否则默认王橹杰（直球话多） */
+function pickFactPersona(t){
+  var who = detectPersona(t);
+  if (who) return who;
+  if (/穆祉丞|恩仔|师兄|祉丞/.test(t)) return 'zhicheng';
+  return 'lujie';
+}
+function fill(tpl, map){ return tpl.replace(/\{\{(\w+)\}\}/g, function(_, k){ return (map && map[k]) || ''; }); }
+function renderFact(fa, t){
+  var p = PERSONAS[pickFactPersona(t)];
+  var say = p.say || {};
+  if (fa.topic === 'moments') return fill(say.moments || '{{LIST}}', fa);
+  if (fa.topic === 'moment') return fill(say.moment || '{{TITLE}}：{{DESC}}', fa);
+  if (fa.topic === 'data') return say.data || '';
+  if (fa.topic === 'feed') return fill(say.feed || '{{LIST}}', fa);
+  if (fa.topic === 'flavor') return say.flavor || '';
+  if (fa.topic === 'guide') return say.guide || '';
+  if (fa.topic === 'quotes') return fill(say.quotes || '{{LIST}}', fa);
+  if (fa.topic === 'info') return fill(say.info || '{{INFO}}', fa);
+  return say.fallback || '';
+}
+
+/* 关键词相关度选回复：避免随机答非所问 */
+function pickReply(list, input){
+  if (!list || !list.length) return '';
+  var best = null, bestScore = 0;
+  list.forEach(function(txt){
+    var score = 0;
+    for (var i = 0; i < input.length - 1; i++){
+      var bigram = input.slice(i, i + 2);
+      if (txt.indexOf(bigram) >= 0) score++;
+    }
+    var words = ['泡泡','生日','合照','唱歌','舞台','粉丝','公开','采访','五公','糖','拉人墙','年龄','感冒','照顾','歌','鱼','灯海','数据'];
+    words.forEach(function(w){ if (input.indexOf(w) >= 0 && txt.indexOf(w) >= 0) score += 3; });
+    if (score > bestScore){ bestScore = score; best = txt; }
+  });
+  if (bestScore >= 2) return best;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+function botReply(input){
+  var t = input.trim();
+  /* 红线 1：性向推定/私生活 */
+  if (RED_LINES.privacy.test(t)) {
+    return { text: '这个话题涉及真实个人的私生活/性向推定，我们不聊 🙅 可以继续问橹穆的公开互动、经历和风味～（AI 人格模拟 · 仅供娱乐）', who: 'narrator' };
+  }
+  /* 红线 2：要求编造语录 */
+  if (RED_LINES.fabricate.test(t)) {
+    return { text: '我不能编造他们的新语录哦——真实语录以公开物料为准（见「💬 语录」页）。如果是想要同人风格的想象台词，会标注「粉丝想象」，不会冒充原话～', who: 'narrator' };
+  }
+  /* 事实问答：用当事人语气答（数据支撑） */
+  var fa = answerFromData(t);
+  if (fa) return { text: renderFact(fa, t), who: pickFactPersona(t) };
+  /* 问候（无称呼时也直接回应） */
+  if (/你好|嗨|哈喽|在吗|早上好|晚上好|hello|hi/.test(t)) {
+    return { text: pick([
+      '你好呀！我是橹穆工作台的小助手 👋 可以问我：语录、名场面、风味、动态、怎么入坑、播放量；也可以带称呼跟「师兄」或「橹橹」聊天。',
+      '嗨！想聊橹穆的什么？直接问就行，或者对「师兄」「橹橹」说句话试试～'
+    ]), who: 'narrator' };
+  }
+  /* 人格对话：必须有称呼/关系性表达 */
+  var who = detectPersona(t);
+  if (!who) {
+    return { text: pick([
+      '嗯，这句我没太接住 😅 你可以试试：问我「橹穆有什么名场面」「最近有什么动态」，或者对「师兄」说「我累了」、对「橹橹」说「你生日什么时候」。',
+      '这个我不太确定，不瞎说。换个问法：比如「橹穆是什么风味」「师兄我感冒了」「橹橹你平时喜欢干什么」～'
+    ]), who: 'narrator' };
+  }
+  var p = PERSONAS[who];
+  var intent = detectIntent(t);
+  var lines = p.replies[intent] || p.replies.fallback;
+  var reply = pickReply(lines, t);
+  /* 30% 概率加一个习惯性小动作 */
+  if (Math.random() < 0.3) reply = pick(p.habits) + reply;
+  return { text: reply, who: who };
+}
+
+function sendChat(){
+  var input = $('chatInput');
+  var t = input.value.trim();
+  if (!t) return;
+  addMsg(t, 'user');
+  input.value = '';
+  setTimeout(function(){
+    var r = botReply(t);
+    var sender = r.who === 'narrator' ? '主持人' : (PERSONAS[r.who].name + '（AI 模拟）');
+    addMsg(r.text, 'bot', sender);
+  }, 350);
+}
+
+addMsg('欢迎来到橹穆 AI 对话 💬 试着跟「师兄」或「橹橹」聊两句吧——他们的说话语气和经历细节都来自公开物料。', 'bot', '主持人');
+addMsg('提示：AI 台词基于公开语录、真实经历与风味框架生成，非本人发言；私生活/性向推定类问题会被拒绝。', 'bot', '主持人');
+</script>
+</body>
+</html>
